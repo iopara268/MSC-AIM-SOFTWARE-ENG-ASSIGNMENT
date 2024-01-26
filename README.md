@@ -94,7 +94,10 @@ Summary of the results are as follows:
 (h) Final test accuracy for 17944 examples: 55.39456. Testing batch[560/561]
 
 In summary, the model achieved a final test accuracy of 55.39% on a dataset of 17,944 examples. The accuracy is typically used to assess how well the model generalizes to new, unseen data.
+![Alt text](<report_pics/result of CNN model.jpeg>)
+![Alt text](<report_pics/result of CNN model graph representation.jpeg>)
 
+Fig 5 and 6. The Fig shows the performance of the CNN model.
 
 CONCLUSION
 
