@@ -1,0 +1,76 @@
+# UNIT TESTING 
+
+import unittest
+
+class TestYourCode(unittest.TestCase):
+    DATASET_DIR = 'data/images'  
+    def setUp(self):
+        
+        pass
+
+    def tearDown(self):
+        
+        pass
+
+    def test_load_image_tensor(self):
+        img_tensor = load_image_tensor(os.path.join(self.DATASET_DIR, "train", "angry", "3905.jpg"))
+        self.assertIsInstance(img_tensor, torch.Tensor)  
+
+    def test_FERDataset(self):     
+        dummy_data = {
+            "Image Path": [os.path.join(self.DATASET_DIR, "train", "angry", "3905.jpg")],
+            "Label": [0],
+        }
+        dummy_df = pd.DataFrame(dummy_data)
+        
+        dataset = FERDataset(dummy_df)
+        self.assertEqual(len(dataset), 1)
+        sample = dataset[0]
+        self.assertIsInstance(sample, dict)
+        self.assertIn("Image Path", sample)
+        self.assertIn("Label", sample["Label"])
+
+    def test_load_data(self):
+        dataset_df = pd.DataFrame({
+            "Image Path": [os.path.join(self.DATASET_DIR, "train", "angry", "3905.jpg")],
+            "Label": [0],
+        })
+        train_dl, _, _ = load_data(dataset_df, batch_sz=4)
+        self.assertIsInstance(train_dl, DataLoader)
+
+    def test_get_simple_conv_net(self):
+        model = get_simple_conv_net()
+        self.assertIsInstance(model, torch.nn.Sequential)
+
+    def test_train_model_gpu_lr_conv(self):
+        model = get_simple_conv_net()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
+        optim = SGD(model.parameters(), lr=0.001)
+        lr_sch = ExponentialLR(optim, gamma=0.8)
+        train_dl, _, _ = load_data(Dataset_df, batch_sz=4)
+        train_model_gpu_lr_conv(model, epochs=1, train_dl=train_dl, optimiser=optim, lr_scheduler=lr_sch)
+
+    def test_early_stopper(self):
+        early_stopper = EarlyStopper(patience=2, tolerance=0.1)
+        self.assertFalse(early_stopper.should_stop(0.8))
+        self.assertFalse(early_stopper.should_stop(0.9))
+        self.assertTrue(early_stopper.should_stop(0.5))
+
+    def test_train_model_final(self):
+        model = get_simple_conv_net()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
+        optim = SGD(model.parameters(), lr=0.001)
+        lr_sch = ExponentialLR(optim, gamma=0.8)
+        train_dl, val_dl, _ = load_data(Dataset_df, batch_sz=4)
+        writer = SummaryWriter()
+        early_stopper = EarlyStopper(patience=2, tolerance=0.1)
+        train_model_final(model, epochs=1, dataloaders={'train': train_dl, 'val': val_dl}, optimiser=optim,
+                          lr_scheduler=lr_sch, writer=writer, early_stopper=early_stopper, checkpoint_frequency=1)
+
+if __name__ == '__main__':
+    unittest.main()
+
+
+
